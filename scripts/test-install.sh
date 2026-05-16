@@ -42,11 +42,12 @@ with_uname() {
   local s_out="$1" m_out="$2"
   shift 2
   (
+    # shellcheck disable=SC2317  # called indirectly via detect_os/detect_arch
     uname() {
       case "${1:-}" in
         -s) printf '%s' "$s_out" ;;
         -m) printf '%s' "$m_out" ;;
-        *) printf '%s' "$s_out" ;;
+        *)  printf '%s' "$s_out" ;;
       esac
     }
     "$@"
@@ -57,11 +58,7 @@ with_uname() {
 printf '## detect_os\n'
 assert_eq "$(with_uname Linux x86_64 detect_os)"  "linux"  "detect_os: Linux"
 assert_eq "$(with_uname Darwin arm64 detect_os)"  "darwin" "detect_os: Darwin"
-assert_fails "detect_os: rejects Windows_NT" bash -c '
-  TALES_INSTALL_LIB_ONLY=1 source "'"${SCRIPT_DIR}"'/install.sh"
-  uname() { case "${1:-}" in -s) echo Windows_NT;; -m) echo x86_64;; esac; }
-  detect_os
-'
+assert_fails "detect_os: rejects Windows_NT" with_uname Windows_NT x86_64 detect_os
 
 # ---- detect_arch ----
 printf '## detect_arch\n'
@@ -69,11 +66,7 @@ assert_eq "$(with_uname Linux x86_64  detect_arch)" "x86_64" "detect_arch: x86_6
 assert_eq "$(with_uname Linux amd64   detect_arch)" "x86_64" "detect_arch: amd64 -> x86_64"
 assert_eq "$(with_uname Linux arm64   detect_arch)" "arm64"  "detect_arch: arm64"
 assert_eq "$(with_uname Linux aarch64 detect_arch)" "arm64"  "detect_arch: aarch64 -> arm64"
-assert_fails "detect_arch: rejects i386" bash -c '
-  TALES_INSTALL_LIB_ONLY=1 source "'"${SCRIPT_DIR}"'/install.sh"
-  uname() { case "${1:-}" in -s) echo Linux;; -m) echo i386;; esac; }
-  detect_arch
-'
+assert_fails "detect_arch: rejects i386" with_uname Linux i386 detect_arch
 
 # ---- normalize_version ----
 printf '## normalize_version\n'

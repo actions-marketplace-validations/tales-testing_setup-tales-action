@@ -191,7 +191,7 @@ Run tests locally:
 
 ```bash
 bash scripts/test-install.sh
-shellcheck scripts/*.sh
+shellcheck -x scripts/*.sh
 ```
 
 ## License

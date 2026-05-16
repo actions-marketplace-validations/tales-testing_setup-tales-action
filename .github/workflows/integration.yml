@@ -1,0 +1,36 @@
+name: Integration
+
+# Manual only — enable once tales-testing/tales has published its first
+# GoReleaser-built release. This workflow exercises the action against the
+# real Tales releases on both Linux and macOS runners.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tales version to install
+        default: latest
+
+jobs:
+  integration:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: setup
+        uses: ./
+        with:
+          version: ${{ inputs.version }}
+
+      - name: Verify tales is on PATH
+        run: tales --version
+
+      - name: Print action outputs
+        run: |
+          echo "version=${{ steps.setup.outputs.version }}"
+          echo "path=${{ steps.setup.outputs.path }}"

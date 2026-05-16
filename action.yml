@@ -1,0 +1,50 @@
+name: Setup Tales
+description: Install the Tales integration and E2E testing CLI
+author: Tales Testing
+branding:
+  icon: check-circle
+  color: gray-dark
+
+inputs:
+  version:
+    description: Tales version to install. Use "latest" or a tag like "v0.1.0".
+    required: false
+    default: latest
+  github-token:
+    description: GitHub token used to query GitHub Releases and download assets.
+    required: false
+    default: ${{ github.token }}
+  repo:
+    description: GitHub repository to download Tales from.
+    required: false
+    default: tales-testing/tales
+  install-dir:
+    description: Directory where the Tales binary will be installed.
+    required: false
+    default: ${{ runner.temp }}/tales/bin
+  verify-checksum:
+    description: Verify downloaded archive against checksums.txt.
+    required: false
+    default: "true"
+
+outputs:
+  version:
+    description: Installed Tales version/tag.
+    value: ${{ steps.install.outputs.version }}
+  path:
+    description: Path to installed tales binary.
+    value: ${{ steps.install.outputs.path }}
+
+runs:
+  using: composite
+  steps:
+    - id: install
+      name: Install Tales
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_REPO: ${{ inputs.repo }}
+        INPUT_INSTALL_DIR: ${{ inputs.install-dir }}
+        INPUT_VERIFY_CHECKSUM: ${{ inputs.verify-checksum }}
+      run: bash "${{ github.action_path }}/scripts/install.sh"

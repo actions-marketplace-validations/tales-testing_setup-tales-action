@@ -7,7 +7,7 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=./install.sh
+# shellcheck source=scripts/install.sh
 TALES_INSTALL_LIB_ONLY=1 source "${SCRIPT_DIR}/install.sh"
 
 PASS=0
@@ -42,7 +42,7 @@ with_uname() {
   local s_out="$1" m_out="$2"
   shift 2
   (
-    # shellcheck disable=SC2317  # called indirectly via detect_os/detect_arch
+    # shellcheck disable=SC2317,SC2329  # called indirectly via detect_os/detect_arch
     uname() {
       case "${1:-}" in
         -s) printf '%s' "$s_out" ;;

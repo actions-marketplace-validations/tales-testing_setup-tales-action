@@ -65,7 +65,10 @@ _auth_args() {
 
 resolve_latest_version() {
   local repo="$1"
-  local url="https://api.github.com/repos/${repo}/releases/latest"
+  local latest_url="https://api.github.com/repos/${repo}/releases/latest"
+  # /releases/latest 404s when only pre-releases or drafts exist. Fall back to
+  # the full listing (which includes pre-releases) and pick the most recent.
+  local list_url="https://api.github.com/repos/${repo}/releases?per_page=1"
   local json
   local -a curl_args=(
     -fsSL
@@ -75,8 +78,16 @@ resolve_latest_version() {
   if [[ -n "${INPUT_GITHUB_TOKEN:-}" ]]; then
     curl_args+=(-H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}")
   fi
-  if ! json="$(curl "${curl_args[@]}" "$url")"; then
-    fail "failed to query GitHub Releases API: ${url}"
+  if json="$(curl "${curl_args[@]}" "$latest_url" 2>/dev/null)"; then
+    parse_tag_name "$json"
+    return
+  fi
+  log "no stable release found, falling back to most recent (incl. pre-releases)..."
+  if ! json="$(curl "${curl_args[@]}" "$list_url")"; then
+    fail "failed to query GitHub Releases API: ${latest_url} and ${list_url}"
+  fi
+  if [[ -z "$json" || "$json" == "[]" ]]; then
+    fail "no releases (stable or pre-release) found at ${repo}"
   fi
   parse_tag_name "$json"
 }

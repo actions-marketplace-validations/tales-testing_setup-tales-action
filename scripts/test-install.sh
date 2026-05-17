@@ -87,6 +87,11 @@ SAMPLE_JSON='{
   "name": "v1.2.3"
 }'
 assert_eq "$(parse_tag_name "$SAMPLE_JSON")" "v1.2.3" "parse_tag_name: extracts tag"
+SAMPLE_LIST='[
+  {"tag_name": "v0.1.0-rc.1", "name": "v0.1.0-rc.1"},
+  {"tag_name": "v0.1.0-rc.0", "name": "v0.1.0-rc.0"}
+]'
+assert_eq "$(parse_tag_name "$SAMPLE_LIST")" "v0.1.0-rc.1" "parse_tag_name: picks first tag from list (pre-release fallback)"
 assert_fails "parse_tag_name: fails without tag_name" parse_tag_name '{"name":"nope"}'
 
 # ---- verify_checksum ----

@@ -34,7 +34,7 @@ jobs:
 
 | Name | Required | Default | Description |
 | --- | --- | --- | --- |
-| `version` | no | `latest` | Tales version to install. Use `latest` or a tag like `v0.1.0`. |
+| `version` | no | `latest` | Tales version to install. Use `latest` or a tag like `v0.1.0`. `latest` resolves to the most recent stable release, and falls back to the most recent pre-release if none exists. |
 | `github-token` | no | `${{ github.token }}` | Token used to query the GitHub Releases API and (when needed) download assets. Increase your rate limit and allow private-repo access by setting this. |
 | `repo` | no | `tales-testing/tales` | Repository to download Tales from. Useful for testing forks or private repos. |
 | `install-dir` | no | `${{ runner.temp }}/tales/bin` | Directory where the Tales binary will be installed. Created if missing. |
